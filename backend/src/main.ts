@@ -1,7 +1,10 @@
+import config from 'config'
+
 import { app } from './app.js'
-import { config } from './config.js'
 import { logger } from './utils/logger.js'
 
-app.listen(config.PORT, () => {
-  logger.info(`Server is running on port ${config.PORT}`)
+const port = config.get<number>('PORT')
+
+app.listen(port, () => {
+  logger.info(`Server is running on port ${port}`)
 })

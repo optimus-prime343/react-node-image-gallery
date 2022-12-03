@@ -1,8 +1,8 @@
+import config from 'config'
 import jsonwebtoken from 'jsonwebtoken'
 
-import { config } from '../../config.js'
-
-const JWT_EXPIRES_IN = '30d'
+const JWTSecret = config.get<string>('JWT_SECRET')
+const JWTExpiresIn = config.get<string>('JWT_EXPIRES_IN')
 
 export const generateJWT = <TPayload extends object>(
   payload: TPayload
@@ -10,8 +10,8 @@ export const generateJWT = <TPayload extends object>(
   return new Promise((resolve, reject) => {
     jsonwebtoken.sign(
       payload,
-      config.JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN },
+      JWTSecret,
+      { expiresIn: JWTExpiresIn },
       (error, token) => {
         if (error) return reject(error)
         if (!token) return reject(new Error('No token generated'))
@@ -22,7 +22,7 @@ export const generateJWT = <TPayload extends object>(
 }
 export const verifyJWT = <TResponse>(token: string): Promise<TResponse> => {
   return new Promise((resolve, reject) => {
-    jsonwebtoken.verify(token, config.JWT_SECRET, (error, data) => {
+    jsonwebtoken.verify(token, JWTSecret, (error, data) => {
       if (error) return reject(error)
       if (!data) return reject(new Error('No data'))
       resolve(data as TResponse)
