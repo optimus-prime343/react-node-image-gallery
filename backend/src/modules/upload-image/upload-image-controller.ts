@@ -21,12 +21,16 @@ const getUploadedImages = expressAsyncHandler(async (_req, res, _next) => {
 const uploadImage = expressAsyncHandler(async (req, res, _next) => {
   const { user } = res.locals as { user: User }
   const { uploadedImages } = req.body as UploadImagePayload
+
+  const createImageUrl = (image: string): string =>
+    `${req.protocol}://${req.get('host')}/images/${image}`
+
   const uploadedImagesDB = await Promise.all(
     uploadedImages.map(
       async image =>
         await prisma.image.create({
           data: {
-            name: image,
+            url: createImageUrl(image),
             userId: user.id
           }
         })
