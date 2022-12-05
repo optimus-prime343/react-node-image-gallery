@@ -13,6 +13,7 @@ const getUploadedImages = expressAsyncHandler(async (_req, res, _next) => {
     }
   })
   res.status(StatusCodes.OK).json({
+    status: 'success',
     message: 'Images fetched successfully',
     data: { images }
   })
@@ -37,6 +38,7 @@ const uploadImage = expressAsyncHandler(async (req, res, _next) => {
     )
   )
   res.status(StatusCodes.OK).json({
+    status: 'success',
     message: 'Image upload successful',
     data: { images: uploadedImagesDB }
   })

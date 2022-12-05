@@ -44,7 +44,6 @@ const optimizeSaveImage = expressAsyncHandler(async (req, _res, next) => {
         return fileName
       })
     )
-    console.log(images)
     req.body.uploadedImages = images
     next()
   } catch (error) {

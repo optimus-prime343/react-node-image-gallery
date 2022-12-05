@@ -31,6 +31,7 @@ const login = expressAsyncHandler(async (req, res, next) => {
   }
   const accessToken = await generateJWT({ userId: user.id })
   res.status(StatusCodes.OK).json({
+    status: 'success',
     message: 'Login successful',
     data: { accessToken }
   })
@@ -49,6 +50,7 @@ const signup = expressAsyncHandler(async (req, res, next) => {
   })
   const accessToken = await generateJWT({ userId: user.id })
   res.status(StatusCodes.CREATED).json({
+    status: 'success',
     message: 'Signup successful',
     data: { accessToken }
   })

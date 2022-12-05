@@ -6,7 +6,8 @@ const globalErrorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
   const typedError = error as HttpError
   const statusCode = typedError.statusCode ?? StatusCodes.BAD_REQUEST
   res.status(statusCode).json({
-    data: { message: typedError.message }
+    status: 'error',
+    data: { error: typedError.message }
   })
 }
 
