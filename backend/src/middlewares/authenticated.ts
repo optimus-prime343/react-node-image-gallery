@@ -27,7 +27,15 @@ const authenticated = expressAsyncHandler(async (req, res, next) => {
       )
     )
   }
-  const user = await prisma.user.findUnique({ where: { id: userId } })
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  })
   if (user === null) {
     return next(createHttpError(StatusCodes.UNAUTHORIZED, 'User not found'))
   }

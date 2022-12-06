@@ -1,13 +1,15 @@
 import { Router } from 'express'
 
 import { URLS } from '../../constants/urls.js'
+import { authenticated } from '../../middlewares/authenticated.js'
 import { validateResource } from '../../middlewares/validate-resource.js'
-import { login, signup } from './auth-controller.js'
+import { login, profile, signup } from './auth-controller.js'
 import { authSchema } from './auth-schema.js'
 
 const authRouter = Router()
 
-authRouter.get(URLS.login, validateResource(authSchema), login)
-authRouter.get(URLS.signup, validateResource(authSchema), signup)
+authRouter.post(URLS.login, validateResource(authSchema), login)
+authRouter.post(URLS.signup, validateResource(authSchema), signup)
+authRouter.get(URLS.profile, authenticated, profile)
 
 export { authRouter }

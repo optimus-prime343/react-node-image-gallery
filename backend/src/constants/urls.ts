@@ -3,5 +3,6 @@ export const URLS = {
   authBaseEndpoint: '/auth',
   login: '/login',
   signup: '/signup',
+  profile: '/profile',
   uploadImage: '/upload-image'
 } as const

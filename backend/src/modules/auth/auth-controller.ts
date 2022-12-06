@@ -1,3 +1,4 @@
+import type { User } from '@prisma/client'
 import argon from 'argon2'
 import expressAsyncHandler from 'express-async-handler'
 import createHttpError from 'http-errors'
@@ -13,12 +14,7 @@ const login = expressAsyncHandler(async (req, res, next) => {
     where: { email }
   })
   if (user === null) {
-    return next(
-      createHttpError(
-        StatusCodes.UNAUTHORIZED,
-        'Username or password is incorrect'
-      )
-    )
+    return next(createHttpError(StatusCodes.UNAUTHORIZED, 'No user found'))
   }
   const isPasswordCorrect = await argon.verify(user.password, password)
   if (!isPasswordCorrect) {
@@ -55,5 +51,16 @@ const signup = expressAsyncHandler(async (req, res, next) => {
     data: { accessToken }
   })
 })
+const profile = expressAsyncHandler(async (_req, res, next) => {
+  const { user } = res.locals as { user: User }
+  if (user === undefined) {
+    return next(createHttpError(StatusCodes.UNAUTHORIZED, 'Unauthorized'))
+  }
+  res.status(StatusCodes.OK).json({
+    status: 'success',
+    message: 'Profile fetched successfully',
+    data: { user }
+  })
+})
 
-export { login, signup }
+export { login, profile, signup }
