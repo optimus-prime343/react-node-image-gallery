@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import nookies from 'nookies'
 
 const getApiEndpoint = (): string => {
@@ -14,15 +14,5 @@ const getApiEndpoint = (): string => {
 const axiosClient = axios.create({
   baseURL: getApiEndpoint(),
   withCredentials: true,
-})
-axiosClient.interceptors.request.use(config => {
-  const { accessToken } = nookies.get(undefined, 'accessToken')
-  if (accessToken) {
-    return {
-      ...config,
-      headers: { ...config.headers, Authorization: `Bearer ${accessToken}` },
-    }
-  }
-  return config
 })
 export { axiosClient }

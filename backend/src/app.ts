@@ -1,4 +1,5 @@
 import config from 'config'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import Express from 'express'
 import morgan from 'morgan'
@@ -10,6 +11,7 @@ import { globalErrorHandler } from './global-error-handler.js'
 
 const app = Express()
 
+app.use(cookieParser())
 app.use(Express.json())
 app.use(Express.urlencoded({ extended: true }))
 app.use(

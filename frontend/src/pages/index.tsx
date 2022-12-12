@@ -3,22 +3,19 @@ import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { GetServerSideProps } from 'next'
 import nookies from 'nookies'
 
+import { useLogout } from '~features/auth/hooks/use-logout'
+
 import { fetchUser, LoginForm, useUser } from '../features/auth'
-import { QueryKeys } from '../shared'
+import { QueryKeys } from '../types'
 
 const HomePage = () => {
-  const { data: user, fetchStatus } = useUser()
+  const logout = useLogout()
+  const { data: user, isFetching } = useUser()
+
   return (
     <>
-      <LoadingOverlay
-        overlayBlur={2}
-        pos='fixed'
-        inset={0}
-        visible={fetchStatus === 'fetching'}
-      />
-      <Center mih='100vh'>
-        {user !== undefined ? <h1>Welcome</h1> : <LoginForm />}
-      </Center>
+      <LoadingOverlay overlayBlur={4} pos='fixed' inset={0} visible={isFetching} />
+      <Center mih='100vh'>{user ? <h1>Welcome</h1> : <LoginForm />}</Center>
     </>
   )
 }

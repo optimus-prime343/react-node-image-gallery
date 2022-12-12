@@ -13,7 +13,9 @@ import { closeModal, openConfirmModal } from '@mantine/modals'
 import { showNotification } from '@mantine/notifications'
 import { IconMail, IconPassword } from '@tabler/icons'
 
-import { useLogin, useSignup, useUser } from '../hooks'
+import { useLogin } from '../hooks/use-login'
+import { useSignup } from '../hooks/use-signup'
+import { useUser } from '../hooks/use-user'
 import { AuthPayload, authSchema } from '../schemas/auth-schema'
 
 const confirmSignupModalId = 'confirm-signup-modal'

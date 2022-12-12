@@ -1,6 +1,6 @@
 import nookies from 'nookies'
 
-import { axiosClient } from '../../../shared'
+import { axiosClient } from '~utils'
 
 export const autoLogin = (accessToken: string) => {
   axiosClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`

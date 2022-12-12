@@ -2,14 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import nookies from 'nookies'
 
-import {
-  ApiResponseFailure,
-  ApiResponseSuccess,
-  axiosClient,
-  QueryKeys,
-  User,
-} from '../../../shared'
-import { apiUrls } from '../../../shared/constants/api-urls'
+import { apiUrls } from '~constants/api-urls'
+import { User } from '~features/auth/types/user'
+import { ApiResponseFailure, ApiResponseSuccess, QueryKeys } from '~types'
+import { axiosClient } from '~utils'
 
 // we are accepting accessToken since we will be using this function on server side also
 export const fetchUser = async (accessToken?: string): Promise<User> => {
@@ -28,8 +24,5 @@ export const fetchUser = async (accessToken?: string): Promise<User> => {
 }
 
 export const useUser = () => {
-  const { accessToken } = nookies.get(undefined, 'accessToken')
-  return useQuery<User, Error>([QueryKeys.USER], () => fetchUser(), {
-    enabled: !!accessToken,
-  })
+  return useQuery<User | null, Error>([QueryKeys.USER], () => fetchUser())
 }

@@ -1,23 +1,21 @@
 import config from 'config'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import jsonwebtoken from 'jsonwebtoken'
 
-const JWTSecret = config.get<string>('JWT_SECRET')
-const JWTExpiresIn = config.get<string>('JWT_EXPIRES_IN')
+type CookieName = 'accessToken' | 'refreshToken'
 
-export const generateJWT = <TPayload extends object>(
-  payload: TPayload
+const JWTSecret = config.get<string>('JWT_SECRET')
+
+export const generateJWT = (
+  userId: string,
+  options: jsonwebtoken.SignOptions
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    jsonwebtoken.sign(
-      payload,
-      JWTSecret,
-      { expiresIn: JWTExpiresIn },
-      (error, token) => {
-        if (error) return reject(error)
-        if (!token) return reject(new Error('No token generated'))
-        resolve(token)
-      }
-    )
+    jsonwebtoken.sign({ userId }, JWTSecret, options, (error, token) => {
+      if (error) return reject(error)
+      if (!token) return reject(new Error('No token generated'))
+      resolve(token)
+    })
   })
 }
 export const verifyJWT = <TResponse>(token: string): Promise<TResponse> => {
@@ -28,4 +26,16 @@ export const verifyJWT = <TResponse>(token: string): Promise<TResponse> => {
       resolve(data as TResponse)
     })
   })
+}
+export const sendCookie = (name: CookieName, value: string): RequestHandler => {
+  const COOKIE_MAX_AGE = 30 * 24 * 60 * 60 * 1000 // 30 days
+  return (_req: Request, res: Response, next: NextFunction): void => {
+    res.cookie(name, value, {
+      maxAge: COOKIE_MAX_AGE,
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production'
+    })
+    next()
+  }
 }

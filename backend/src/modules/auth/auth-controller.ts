@@ -6,7 +6,8 @@ import { StatusCodes } from 'http-status-codes'
 
 import { prisma } from '../../utils/db.js'
 import type { AuthPayload } from './auth-schema.js'
-import { generateJWT } from './auth-utils.js'
+import { createAuthSession } from './auth-service.js'
+import { sendCookie } from './auth-utils.js'
 
 const login = expressAsyncHandler(async (req, res, next) => {
   const { email, password } = req.body as AuthPayload
@@ -25,11 +26,12 @@ const login = expressAsyncHandler(async (req, res, next) => {
       )
     )
   }
-  const accessToken = await generateJWT({ userId: user.id })
+  const { accessToken, refreshToken } = await createAuthSession(user.id)
+  sendCookie('accessToken', accessToken)(req, res, next)
+  sendCookie('refreshToken', refreshToken)(req, res, next)
   res.status(StatusCodes.OK).json({
     status: 'success',
-    message: 'Login successful',
-    data: { accessToken }
+    message: 'Login successful'
   })
 })
 const signup = expressAsyncHandler(async (req, res, next) => {
@@ -44,22 +46,21 @@ const signup = expressAsyncHandler(async (req, res, next) => {
   const user = await prisma.user.create({
     data: { email, password: hashedPassword }
   })
-  const accessToken = await generateJWT({ userId: user.id })
+  const { accessToken, refreshToken } = await createAuthSession(user.id)
+  sendCookie('accessToken', accessToken)(req, res, next)
+  sendCookie('refreshToken', refreshToken)(req, res, next)
   res.status(StatusCodes.CREATED).json({
     status: 'success',
-    message: 'Signup successful',
-    data: { accessToken }
+    message: 'Signup successful'
   })
 })
-const profile = expressAsyncHandler(async (_req, res, next) => {
-  const { user } = res.locals as { user: User }
-  if (user === undefined) {
-    return next(createHttpError(StatusCodes.UNAUTHORIZED, 'Unauthorized'))
-  }
+const profile = expressAsyncHandler(async (_req, res, _next) => {
+  const { user } = res.locals as { user?: User }
   res.status(StatusCodes.OK).json({
     status: 'success',
     message: 'Profile fetched successfully',
-    data: { user }
+    // here we are sending null instead of undefined because react-query complains if we return undefined from a query
+    data: { user: user === undefined ? null : user }
   })
 })
 

@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 
-import { ApiResponseFailure, ApiResponseSuccess, axiosClient } from '../../../shared'
-import { apiUrls } from '../../../shared/constants/api-urls'
+import { ApiResponseFailure, ApiResponseSuccess } from '~/types'
+import { apiUrls } from '~constants/api-urls'
+import { axiosClient } from '~utils'
+
 import { AuthPayload } from '../schemas/auth-schema'
 import { autoLogin } from '../utils/auth'
 
@@ -11,8 +13,8 @@ export const useLogin = () => {
     axiosClient
       .post<ApiResponseSuccess<{ accessToken: string }>>(apiUrls.login, loginPayload)
       .then(res => {
-        const { accessToken } = res.data.data
-        autoLogin(accessToken)
+        // const { accessToken } = res.data.data
+        // autoLogin(accessToken)
         return 'Successfully logged in'
       })
       .catch(error => {

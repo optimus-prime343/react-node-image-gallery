@@ -1,7 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 
-import { ApiResponseSuccess, axiosClient } from '../../../shared'
-import { apiUrls } from '../../../shared/constants/api-urls'
+import { apiUrls } from '~constants/api-urls'
+import { ApiResponseSuccess } from '~types'
+import { axiosClient } from '~utils'
+
 import { AuthPayload } from '../schemas/auth-schema'
 import { autoLogin } from '../utils/auth'
 

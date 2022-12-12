@@ -34,7 +34,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <QueryClientProvider client={client}>
       <ReactQueryDevtools />
       <MantineProvider withGlobalStyles withNormalizeCSS theme={mantineTheme}>
-        <NotificationsProvider>
+        <NotificationsProvider position='top-center'>
           <ModalsProvider>
             <Hydrate state={pageProps.dehydratedState}>
               <Component {...pageProps} />
