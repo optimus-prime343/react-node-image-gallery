@@ -1,15 +1,16 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { useMutation } from '@tanstack/react-query'
 
-import { QueryKeys } from '~types'
-
-import { autoLogout } from '../utils/auth'
+import { ApiResponseSuccess } from '~types'
+import { axiosClient } from '~utils'
 
 export const useLogout = () => {
-  const queryClient = useQueryClient()
-  const logout = useCallback(() => {
-    autoLogout()
-    queryClient.setQueryData([QueryKeys.USER], null)
-  }, [queryClient])
-  return logout
+  return useMutation<string, Error, undefined>(() =>
+    axiosClient
+      .get<ApiResponseSuccess>('/auth/logout')
+      .then(response => response.data.message)
+      .catch(error => {
+        console.log(error)
+        throw new Error(error.response?.data ?? 'Something went wrong')
+      })
+  )
 }

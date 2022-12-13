@@ -4,5 +4,6 @@ export const URLS = {
   login: '/login',
   signup: '/signup',
   profile: '/profile',
+  logout: '/logout',
   uploadImage: '/upload-image'
 } as const

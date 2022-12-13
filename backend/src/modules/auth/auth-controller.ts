@@ -54,6 +54,21 @@ const signup = expressAsyncHandler(async (req, res, next) => {
     message: 'Signup successful'
   })
 })
+const logout = expressAsyncHandler(async (req, res, next) => {
+  const { refreshToken } = req.cookies
+  const session = await prisma.session.findFirst({ where: { refreshToken } })
+  if (session === null) {
+    return next(createHttpError(StatusCodes.UNAUTHORIZED, 'No session found'))
+  }
+  await prisma.session.delete({ where: { id: session.id } })
+  res.clearCookie('accessToken')
+  res.clearCookie('refreshToken')
+  res.status(StatusCodes.OK).json({
+    status: 'success',
+    message: 'Logout successful'
+  })
+})
+
 const profile = expressAsyncHandler(async (_req, res, _next) => {
   const { user } = res.locals as { user?: User }
   res.status(StatusCodes.OK).json({
@@ -64,4 +79,4 @@ const profile = expressAsyncHandler(async (_req, res, _next) => {
   })
 })
 
-export { login, profile, signup }
+export { login, logout, profile, signup }

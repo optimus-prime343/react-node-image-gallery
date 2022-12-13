@@ -1,4 +1,4 @@
-export interface ApiResponseSuccess<TSuccessData> {
+export interface ApiResponseSuccess<TSuccessData = unknown> {
   status: 'success'
   message: string
   data: TSuccessData
