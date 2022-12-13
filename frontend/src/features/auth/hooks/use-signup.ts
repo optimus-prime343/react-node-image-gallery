@@ -5,7 +5,6 @@ import { ApiResponseSuccess } from '~types'
 import { axiosClient } from '~utils'
 
 import { AuthPayload } from '../schemas/auth-schema'
-import { autoLogin } from '../utils/auth'
 
 export const useSignup = () => {
   return useMutation<string, Error, AuthPayload>(signupPayload =>
@@ -14,9 +13,7 @@ export const useSignup = () => {
         apiUrls.signup,
         signupPayload
       )
-      .then(res => {
-        const { accessToken } = res.data.data
-        autoLogin(accessToken)
+      .then(() => {
         return 'Signup successful'
       })
       .catch(error => {

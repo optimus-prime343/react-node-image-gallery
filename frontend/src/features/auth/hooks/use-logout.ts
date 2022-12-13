@@ -9,7 +9,6 @@ export const useLogout = () => {
       .get<ApiResponseSuccess>('/auth/logout')
       .then(response => response.data.message)
       .catch(error => {
-        console.log(error)
         throw new Error(error.response?.data ?? 'Something went wrong')
       })
   )

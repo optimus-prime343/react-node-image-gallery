@@ -6,15 +6,12 @@ import { apiUrls } from '~constants/api-urls'
 import { axiosClient } from '~utils'
 
 import { AuthPayload } from '../schemas/auth-schema'
-import { autoLogin } from '../utils/auth'
 
 export const useLogin = () => {
   return useMutation<string, Error, AuthPayload>(loginPayload =>
     axiosClient
       .post<ApiResponseSuccess<{ accessToken: string }>>(apiUrls.login, loginPayload)
-      .then(res => {
-        // const { accessToken } = res.data.data
-        // autoLogin(accessToken)
+      .then(() => {
         return 'Successfully logged in'
       })
       .catch(error => {
