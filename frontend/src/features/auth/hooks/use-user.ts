@@ -24,5 +24,14 @@ export const fetchUser = async (accessToken?: string): Promise<User> => {
 }
 
 export const useUser = () => {
-  return useQuery<User | null, Error>([QueryKeys.USER], () => fetchUser())
+  return useQuery<User | null, Error>([QueryKeys.USER], () => fetchUser(), {
+    retry(failureCount, error) {
+      if (error.message === 'Unauthorized. Please login') {
+        nookies.destroy(null, 'accessToken')
+        nookies.destroy(null, 'refreshToken')
+        return false
+      }
+      return failureCount < 3
+    },
+  })
 }

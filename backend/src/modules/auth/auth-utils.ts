@@ -1,7 +1,6 @@
 import config from 'config'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import jsonwebtoken from 'jsonwebtoken'
-
 type CookieName = 'accessToken' | 'refreshToken'
 
 const JWTSecret = config.get<string>('JWT_SECRET')

@@ -40,21 +40,28 @@ const authenticated = expressAsyncHandler(async (req, res, next) => {
   if (session === null) {
     return next(createHttpError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED))
   }
-  const user = await prisma.user.findUnique({ where: { id: session.userId } })
-
-  if (user === null) {
-    return next(createHttpError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED))
-  }
-  res.locals.user = user
-  await verifyJWT(accessToken).catch(async error => {
-    if (error instanceof jsonwebtoken.TokenExpiredError) {
-      logger.info('Access token expired. Generating new access token')
-      const newAccessToken = await generateJWT(user.id, {
-        expiresIn: config.get('ACCESS_TOKEN_EXPIRES_IN')
+  await verifyJWT<{ userId: string }>(accessToken)
+    .then(async ({ userId }) => {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, createdAt: true, updatedAt: true }
       })
-      sendCookie('accessToken', newAccessToken)(req, res, next)
-    }
-  })
+      if (user === null)
+        return next(createHttpError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED))
+      res.locals.user = user
+    })
+    .catch(async error => {
+      if (
+        error instanceof jsonwebtoken.TokenExpiredError ||
+        error instanceof jsonwebtoken.JsonWebTokenError
+      ) {
+        logger.info('Access token expired. Generating new access token')
+        const newAccessToken = await generateJWT(session.userId, {
+          expiresIn: config.get('ACCESS_TOKEN_EXPIRES_IN')
+        })
+        sendCookie('accessToken', newAccessToken)(req, res, next)
+      }
+    })
   next()
 })
 export { authenticated }
