@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import nookies from 'nookies'
 
 import { apiUrls } from '~constants/api-urls'
-import { User } from '~features/auth/types/user'
 import { ApiResponseFailure, ApiResponseSuccess, QueryKeys } from '~types'
 import { axiosClient } from '~utils'
+
+import { User } from '../models/user'
 
 // we are accepting accessToken since we will be using this function on server side also
 export const fetchUser = async (accessToken?: string): Promise<User> => {
@@ -25,10 +25,9 @@ export const fetchUser = async (accessToken?: string): Promise<User> => {
 
 export const useUser = () => {
   return useQuery<User | null, Error>([QueryKeys.USER], () => fetchUser(), {
+    refetchOnWindowFocus: false,
     retry(failureCount, error) {
       if (error.message === 'Unauthorized. Please login') {
-        nookies.destroy(null, 'accessToken')
-        nookies.destroy(null, 'refreshToken')
         return false
       }
       return failureCount < 3

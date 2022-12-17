@@ -1,4 +1,5 @@
 import config from 'config'
+import type { Response } from 'express'
 import expressAsyncHandler from 'express-async-handler'
 import createHttpError from 'http-errors'
 import { StatusCodes } from 'http-status-codes'
@@ -19,6 +20,12 @@ const isTokenExpired = (expirationEpoch: number): boolean => {
   const expirationDate = new Date(expirationEpoch * 1000) //converting epoch to milliseconds
   return currentDate > expirationDate
 }
+const clearAccessAndRefreshCookies = (res: Response): void => {
+  // remove any invalid cookies from the client
+  res.clearCookie('accessToken')
+  res.clearCookie('refreshToken')
+}
+
 const authenticated = expressAsyncHandler(async (req, res, next) => {
   const requestUrl = req.url
   const { accessToken, refreshToken } = req.cookies as Record<string, string>
@@ -27,6 +34,8 @@ const authenticated = expressAsyncHandler(async (req, res, next) => {
       // allow access to profile page without login
       return next()
     }
+    // remove any invalid cookies from the client
+    clearAccessAndRefreshCookies(res)
     return next(createHttpError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED))
   }
   const { exp: refreshTokenExp } = await verifyJWT<{
@@ -34,10 +43,12 @@ const authenticated = expressAsyncHandler(async (req, res, next) => {
     exp: number
   }>(refreshToken)
   if (isTokenExpired(refreshTokenExp)) {
+    clearAccessAndRefreshCookies(res)
     return next(createHttpError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED))
   }
   const session = await prisma.session.findFirst({ where: { refreshToken } })
   if (session === null) {
+    clearAccessAndRefreshCookies(res)
     return next(createHttpError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED))
   }
   await verifyJWT<{ userId: string }>(accessToken)

@@ -5,6 +5,7 @@ import createHttpError from 'http-errors'
 import { StatusCodes } from 'http-status-codes'
 
 import { prisma } from '../../utils/db.js'
+import { logger } from '../../utils/logger.js'
 import type { AuthPayload } from './auth-schema.js'
 import { createAuthSession } from './auth-service.js'
 import { sendCookie } from './auth-utils.js'
@@ -27,6 +28,7 @@ const login = expressAsyncHandler(async (req, res, next) => {
     )
   }
   const { accessToken, refreshToken } = await createAuthSession(user.id)
+  logger.info(`${user.email} logged into their account`)
   sendCookie('accessToken', accessToken)(req, res, next)
   sendCookie('refreshToken', refreshToken)(req, res, next)
   res.status(StatusCodes.OK).json({
@@ -47,6 +49,7 @@ const signup = expressAsyncHandler(async (req, res, next) => {
     data: { email, password: hashedPassword }
   })
   const { accessToken, refreshToken } = await createAuthSession(user.id)
+  logger.info(`${user.email} signed up for an account`)
   sendCookie('accessToken', accessToken)(req, res, next)
   sendCookie('refreshToken', refreshToken)(req, res, next)
   res.status(StatusCodes.CREATED).json({
@@ -61,6 +64,7 @@ const logout = expressAsyncHandler(async (req, res, next) => {
     return next(createHttpError(StatusCodes.UNAUTHORIZED, 'No session found'))
   }
   await prisma.session.delete({ where: { id: session.id } })
+  logger.info(`${session.userId} logged out of their account`)
   res.clearCookie('accessToken')
   res.clearCookie('refreshToken')
   res.status(StatusCodes.OK).json({
