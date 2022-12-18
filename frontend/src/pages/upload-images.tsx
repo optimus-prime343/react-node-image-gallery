@@ -7,12 +7,12 @@ import { UploadImages } from '~features/upload-images'
 const UploadImagesHomePage = () => {
   return (
     <Center mih='100vh'>
-      <Stack>
+      <Stack align='center' spacing='xs'>
+        <UploadImages />
+        <Divider my='md' w='100%' />
         <Button leftIcon={<IconEye />} component={Link} href='/'>
           View Uploaded Images
         </Button>
-        <Divider my='md' />
-        <UploadImages />
       </Stack>
     </Center>
   )

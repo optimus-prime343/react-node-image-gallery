@@ -7,11 +7,14 @@ const validateResource =
   (schema: AnyZodObject) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      await schema.parseAsync({
+      const parsedData = await schema.parseAsync({
         body: req.body,
         params: req.params,
         query: req.query
       })
+      req.body = parsedData.body
+      req.query = parsedData.query
+      req.params = parsedData.params
       next()
     } catch (error) {
       if (error instanceof ZodError) {

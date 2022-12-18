@@ -3,19 +3,41 @@ import expressAsyncHandler from 'express-async-handler'
 import { StatusCodes } from 'http-status-codes'
 
 import { prisma } from '../../utils/db.js'
-import type { UploadImagePayload } from './upload-image-schema.js'
+import type {
+  UploadedImageQuery,
+  UploadImagePayload
+} from './upload-image-schema.js'
 
-const getUploadedImages = expressAsyncHandler(async (_req, res, _next) => {
+const getUploadedImages = expressAsyncHandler(async (req, res, _next) => {
   const { user } = res.locals as { user: User }
-  const images = await prisma.image.findMany({
+  const query = req.query as UploadedImageQuery
+  const page = query.page ?? 1
+  const perPage = query.perPage ?? 10
+
+  const totalUploadedImages = await prisma.image.count({
     where: {
       userId: user.id
+    }
+  })
+  const totalPages = Math.ceil(totalUploadedImages / perPage)
+
+  const nextPage = page < totalPages ? page + 1 : null
+  const prevPage = page > 1 ? page - 1 : null
+
+  const images = await prisma.image.findMany({
+    take: perPage,
+    skip: perPage * (page - 1),
+    where: {
+      userId: user.id
+    },
+    orderBy: {
+      createdAt: 'desc'
     }
   })
   res.status(StatusCodes.OK).json({
     status: 'success',
     message: 'Images fetched successfully',
-    data: { images }
+    data: { images, currentPage: page, nextPage, prevPage }
   })
 })
 

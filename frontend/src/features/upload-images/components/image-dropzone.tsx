@@ -2,28 +2,33 @@ import { Group, Stack, Text, Title, useMantineTheme } from '@mantine/core'
 import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { IconPhotoPlus } from '@tabler/icons'
 import { nanoid } from 'nanoid'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { UploadedImageFilesPreview } from '../components/uploaded-image-files-preview'
 import { UploadImageFile } from '../models/upload-image-file'
 
 export interface CustomDropzoneProps
   extends Omit<DropzoneProps, 'children' | 'onDrop'> {
-  onImageFilesDrop: (files: File[]) => void
+  uploadImageFiles: UploadImageFile[]
+  setUploadImageFiles: Dispatch<SetStateAction<UploadImageFile[]>>
 }
-export const ImageDropzone = ({ onImageFilesDrop }: CustomDropzoneProps) => {
+export const ImageDropzone = ({
+  uploadImageFiles,
+  setUploadImageFiles,
+}: CustomDropzoneProps) => {
   const theme = useMantineTheme()
-  const [imageFiles, setImageFiles] = useState<UploadImageFile[]>([])
 
   const removeAlreadyUploadedFiles = (uploadedFiles: File[]) => {
     return uploadedFiles.filter(
       uploadedFile =>
-        !imageFiles.find(imageFile => imageFile.file.name === uploadedFile.name)
+        !uploadImageFiles.find(
+          imageFile => imageFile.file.name === uploadedFile.name
+        )
     )
   }
 
   const handleImagesDrop = (files: File[]) => {
-    setImageFiles(prevImageFiles => [
+    setUploadImageFiles(prevImageFiles => [
       ...prevImageFiles,
       ...removeAlreadyUploadedFiles(files).map(file => ({
         id: nanoid(),
@@ -32,13 +37,10 @@ export const ImageDropzone = ({ onImageFilesDrop }: CustomDropzoneProps) => {
     ])
   }
   const handleDeleteImageFile = (imageFileId: string) => {
-    setImageFiles(prevImageFiles =>
+    setUploadImageFiles(prevImageFiles =>
       prevImageFiles.filter(imageFile => imageFile.id !== imageFileId)
     )
   }
-  useEffect(() => {
-    onImageFilesDrop(imageFiles.map(imageFile => imageFile.file))
-  }, [imageFiles, onImageFilesDrop])
 
   return (
     <Stack>
@@ -53,9 +55,9 @@ export const ImageDropzone = ({ onImageFilesDrop }: CustomDropzoneProps) => {
           </Stack>
         </Group>
       </Dropzone>
-      {imageFiles.length > 0 ? (
+      {uploadImageFiles.length > 0 ? (
         <UploadedImageFilesPreview
-          imageFiles={imageFiles}
+          imageFiles={uploadImageFiles}
           onDeleteImageFile={handleDeleteImageFile}
         />
       ) : null}
