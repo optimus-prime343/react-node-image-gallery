@@ -12,16 +12,18 @@ import { useForm, zodResolver } from '@mantine/form'
 import { closeModal, openConfirmModal } from '@mantine/modals'
 import { showNotification } from '@mantine/notifications'
 import { IconMail, IconPassword } from '@tabler/icons'
+import { useQueryClient } from '@tanstack/react-query'
+
+import { QueryKeys } from '~types'
 
 import { useLogin } from '../hooks/use-login'
 import { useSignup } from '../hooks/use-signup'
-import { useUser } from '../hooks/use-user'
 import { AuthPayload, authSchema } from '../schemas/auth-schema'
 
 const confirmSignupModalId = 'confirm-signup-modal'
 
 export const LoginForm = () => {
-  const { refetch: refetchUser } = useUser()
+  const queryClient = useQueryClient()
   const { mutate: loginMutation, isLoading: isLoginLoading } = useLogin()
   const { mutate: signupMutation, isLoading: isSignupLoading } = useSignup()
 
@@ -37,7 +39,7 @@ export const LoginForm = () => {
   const handleCreateAccount = (signupPayload: AuthPayload) => {
     signupMutation(signupPayload, {
       onSuccess: async message => {
-        await refetchUser()
+        await queryClient.invalidateQueries([QueryKeys.USER])
         showNotification({
           title: 'Account created',
           message,
@@ -77,7 +79,7 @@ export const LoginForm = () => {
   const handleSubmit = (values: AuthPayload) => {
     loginMutation(values, {
       onSuccess: async message => {
-        await refetchUser()
+        await queryClient.invalidateQueries([QueryKeys.USER])
         showNotification({
           title: 'Login successful',
           message,

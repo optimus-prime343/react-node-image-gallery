@@ -4,7 +4,7 @@ export interface ApiResponseSuccess<TSuccessData = unknown> {
   data: TSuccessData
 }
 
-export interface ApiResponseFailure<TFailureData = Record<string, any>> {
+export interface ApiResponseFailure<TFailureData = Record<string, unknown>> {
   status: 'failure'
   data: TFailureData
 }

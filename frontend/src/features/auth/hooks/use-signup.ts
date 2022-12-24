@@ -16,7 +16,7 @@ export const useSignup = () => {
       .then(() => {
         return 'Signup successful'
       })
-      .catch(error => {
+      .catch(() => {
         throw new Error('Invalid credentials')
       })
   )

@@ -1,4 +1,4 @@
-export enum QueryKeys {
-  USER = 'user',
-  UPLOADED_IMAGES = 'uploadedImages',
-}
+export const QueryKeys = {
+  USER: 'user',
+  UPLOADED_IMAGES: 'uploadedImages',
+} as const

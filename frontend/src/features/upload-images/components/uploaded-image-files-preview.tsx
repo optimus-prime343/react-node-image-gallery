@@ -19,7 +19,7 @@ export const UploadedImageFilesPreview = ({
   }
 
   const renderImagePreviews = () => {
-    return imageFiles.map((imageFile, index) => (
+    return imageFiles.map(imageFile => (
       <Grid.Col span={3} key={imageFile.id}>
         <BackgroundImage
           pos='relative'

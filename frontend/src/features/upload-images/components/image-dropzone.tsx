@@ -2,7 +2,7 @@ import { Group, Stack, Text, Title, useMantineTheme } from '@mantine/core'
 import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { IconPhotoPlus } from '@tabler/icons'
 import { nanoid } from 'nanoid'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 
 import { UploadedImageFilesPreview } from '../components/uploaded-image-files-preview'
 import { UploadImageFile } from '../models/upload-image-file'

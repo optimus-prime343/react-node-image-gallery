@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 
@@ -45,6 +45,7 @@ export const useUploadedImages = <TRefElement extends HTMLElement>(perPage = 20)
     {
       getNextPageParam: lastPage => lastPage.data.data.nextPage,
       getPreviousPageParam: firstPage => firstPage.data.data.prevPage,
+      enabled: !!user,
     }
   )
   const uploadImagesByPage =
