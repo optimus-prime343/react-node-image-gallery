@@ -78,12 +78,8 @@ export const LoginForm = () => {
 
   const handleSubmit = (values: AuthPayload) => {
     loginMutation(values, {
-      onSuccess: async message => {
+      onSuccess: async () => {
         await queryClient.invalidateQueries([QueryKeys.USER])
-        showNotification({
-          title: 'Login successful',
-          message,
-        })
       },
       onError: error => {
         if (error.message === 'No user found') {

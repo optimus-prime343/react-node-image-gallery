@@ -1,6 +1,8 @@
 import {
   ActionIcon,
+  Box,
   Container,
+  createStyles,
   Divider,
   Group,
   LoadingOverlay,
@@ -30,6 +32,7 @@ const HomePage = () => {
     isLoading: isUploadedImagesLoading,
   } = useUploadedImages<HTMLDivElement>()
   const { mutate: logout, isLoading: isLogoutLoading } = useLogout()
+  const { classes } = useStyles()
 
   const formatImageUploadDate = (imageUploadDate: string) => {
     const currentDate = dayjs()
@@ -101,9 +104,11 @@ const HomePage = () => {
           Object.entries(uploadedImagesByDate ?? {}).map(
             ([imageUploadDate, uploadedImages]) => (
               <Fragment key={imageUploadDate}>
-                <Title order={6} mt='xl' mb='md'>
-                  {formatImageUploadDate(imageUploadDate)}
-                </Title>
+                <Box className={classes.titleContainer} my='xl'>
+                  <Text className={classes.title}>
+                    {formatImageUploadDate(imageUploadDate)}
+                  </Text>
+                </Box>
                 <UploadedImageList
                   ref={ref}
                   isImageLastInArray={isImageLastInArray}
@@ -117,4 +122,29 @@ const HomePage = () => {
     </PrivateRoute>
   )
 }
+const useStyles = createStyles(theme => ({
+  titleContainer: {
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    '&::before': {
+      position: 'absolute',
+      content: "''",
+      left: 0,
+      top: '60%',
+      transform: 'translateY(-60%)',
+      width: '100%',
+      height: 1,
+      backgroundColor: theme.colors.gray[9],
+      zIndex: -1,
+    },
+  },
+  title: {
+    textAlign: 'center',
+    display: 'inline-flex',
+    backgroundColor: theme.colors.dark[7],
+    padding: '0 15px',
+  },
+}))
 export default HomePage
