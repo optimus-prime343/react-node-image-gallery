@@ -17,7 +17,8 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { Fragment } from 'react'
 
-import { PrivateRoute } from '~features/auth'
+import { Layout } from '~components/layout'
+import { PrivateRoute, useUser } from '~features/auth'
 import { useLogout } from '~features/auth/hooks/use-logout'
 import { UploadedImageList, useUploadedImages } from '~features/upload-images'
 import { UploadImageListPlaceholder } from '~features/upload-images/components/upload-image-list-placeholder'
@@ -32,8 +33,12 @@ const HomePage = () => {
     isLoading: isUploadedImagesLoading,
   } = useUploadedImages<HTMLDivElement>()
   const { mutate: logout, isLoading: isLogoutLoading } = useLogout()
+  const { data: user } = useUser()
   const { classes } = useStyles()
 
+  const pageTitle = user
+    ? `Your uploaded images`
+    : 'Login to upload and share your images'
   const formatImageUploadDate = (imageUploadDate: string) => {
     const currentDate = dayjs()
     const dayjsImageUploadDate = dayjs(imageUploadDate)
@@ -64,62 +69,64 @@ const HomePage = () => {
     })
   }
   return (
-    <PrivateRoute>
-      <LoadingOverlay
-        visible={isLogoutLoading}
-        pos='fixed'
-        inset={0}
-        overlayBlur={2}
-      />
-      <Container my='xl'>
-        <Group align='center'>
-          <Title order={2} sx={{ flex: 1 }}>
-            Your uploaded images
-          </Title>
-          <Menu position='top-end'>
-            <Menu.Target>
-              <ActionIcon>
-                <IconUserCircle />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                icon={<IconSquarePlus />}
-                component={Link}
-                href='/upload-images'
-              >
-                Upload more images
-              </Menu.Item>
-              <Menu.Divider />
-              <Menu.Item color='red' icon={<IconLogout />} onClick={handleLogout}>
-                Logout
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
-        <Divider my='lg' />
-        {isUploadedImagesLoading ? (
-          <UploadImageListPlaceholder />
-        ) : (
-          Object.entries(uploadedImagesByDate ?? {}).map(
-            ([imageUploadDate, uploadedImages]) => (
-              <Fragment key={imageUploadDate}>
-                <Box className={classes.titleContainer} my='xl'>
-                  <Text className={classes.title}>
-                    {formatImageUploadDate(imageUploadDate)}
-                  </Text>
-                </Box>
-                <UploadedImageList
-                  ref={ref}
-                  isImageLastInArray={isImageLastInArray}
-                  uploadedImages={uploadedImages}
-                />
-              </Fragment>
+    <Layout title={pageTitle}>
+      <PrivateRoute>
+        <LoadingOverlay
+          visible={isLogoutLoading}
+          pos='fixed'
+          inset={0}
+          overlayBlur={2}
+        />
+        <Container my='xl'>
+          <Group align='center'>
+            <Title order={2} sx={{ flex: 1 }}>
+              Your uploaded images
+            </Title>
+            <Menu position='top-end'>
+              <Menu.Target>
+                <ActionIcon>
+                  <IconUserCircle />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  icon={<IconSquarePlus />}
+                  component={Link}
+                  href='/upload-images'
+                >
+                  Upload more images
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item color='red' icon={<IconLogout />} onClick={handleLogout}>
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Group>
+          <Divider my='lg' />
+          {isUploadedImagesLoading ? (
+            <UploadImageListPlaceholder />
+          ) : (
+            Object.entries(uploadedImagesByDate ?? {}).map(
+              ([imageUploadDate, uploadedImages]) => (
+                <Fragment key={imageUploadDate}>
+                  <Box className={classes.titleContainer} my='xl'>
+                    <Text className={classes.title}>
+                      {formatImageUploadDate(imageUploadDate)}
+                    </Text>
+                  </Box>
+                  <UploadedImageList
+                    ref={ref}
+                    isImageLastInArray={isImageLastInArray}
+                    uploadedImages={uploadedImages}
+                  />
+                </Fragment>
+              )
             )
-          )
-        )}
-      </Container>
-    </PrivateRoute>
+          )}
+        </Container>
+      </PrivateRoute>
+    </Layout>
   )
 }
 const useStyles = createStyles(theme => ({
